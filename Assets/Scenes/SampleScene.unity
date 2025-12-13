@@ -326,14 +326,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6105ec279af578341b7f27f366775bfc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  moveSpeed: 5
-  minX: -8.5
-  maxX: 8.5
-  minY: -4.5
-  maxY: 4.5
-  dashSpeed: 20
-  dashDuration: 0.3
+  moveSpeed: 2
   dashCooldown: 0.5
+  dashDistance: 5
+  safetyBuffer: 0.5
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!114 &138292774
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -380,7 +379,7 @@ MonoBehaviour:
   range: 20
   toBeHit:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 64
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -491,7 +490,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 9
+    m_Bits: 73
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -530,8 +529,8 @@ GameObject:
   - component: {fileID: 853103702}
   - component: {fileID: 853103701}
   - component: {fileID: 853103700}
-  m_Layer: 3
-  m_Name: Square (3)
+  m_Layer: 6
+  m_Name: box_up
   m_TagString: box
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -678,7 +677,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 4.5, z: 0}
-  m_LocalScale: {x: 15.98, y: 1, z: 1}
+  m_LocalScale: {x: 15.99, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -695,8 +694,8 @@ GameObject:
   - component: {fileID: 872251976}
   - component: {fileID: 872251975}
   - component: {fileID: 872251974}
-  m_Layer: 3
-  m_Name: Square (1)
+  m_Layer: 6
+  m_Name: box_down
   m_TagString: box
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -843,7 +842,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -4.5, z: 0}
-  m_LocalScale: {x: 15.98, y: 1, z: 1}
+  m_LocalScale: {x: 15.99, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -860,8 +859,8 @@ GameObject:
   - component: {fileID: 1201557077}
   - component: {fileID: 1201557076}
   - component: {fileID: 1201557075}
-  m_Layer: 3
-  m_Name: Square
+  m_Layer: 6
+  m_Name: box_left
   m_TagString: box
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1025,8 +1024,8 @@ GameObject:
   - component: {fileID: 1646109551}
   - component: {fileID: 1646109550}
   - component: {fileID: 1646109549}
-  m_Layer: 3
-  m_Name: Square (2)
+  m_Layer: 6
+  m_Name: box_right
   m_TagString: box
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

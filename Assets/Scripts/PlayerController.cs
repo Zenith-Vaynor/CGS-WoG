@@ -1,27 +1,20 @@
-using UnityEditor.Analytics;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private float moveSpeed = 4f;
-
-    [SerializeField] private float minX;
-    [SerializeField] private float maxX;
-    [SerializeField] private float minY;
-    [SerializeField] private float maxY;
+    public float moveSpeed = 5f;
 
     private Rigidbody2D rb;
-    private Vector2 moveInput;
     private Animator anim;
+    private Vector2 moveInput;
 
-    public float dashSpeed = 10f;
-    public float dashDuration = 0.2f;
-    public float dashCooldown = 0.5f;
-
-    private bool isDashing = false;
+    public float dashCooldown;
+    public float dashDistance;
+    public float safetyBuffer = 0.5f;
     private float dashTimer = 0f;
-    private Vector2 dashDirection;
+
+    public LayerMask wallLayer;
 
     void Awake()
     {
@@ -33,73 +26,76 @@ public class PlayerController : MonoBehaviour
     {
         moveInput = value.Get<Vector2>();
     }
+
     public void OnDash(InputValue value)
     {
         if (value.isPressed)
         {
             Dash();
-            Debug.Log("dash activated");
         }
     }
 
     void Dash()
     {
-        if (isDashing)
-            return;
-        if (dashTimer > 0f)
-            return;
+        if (dashTimer > 0f) return;
 
         if (moveInput.sqrMagnitude > 0.001f)
         {
-            isDashing = true;
+            Vector2 direction = moveInput.normalized;
+            Vector2 finalSafePosition = CalculateSafeDashPosition(direction);
+
+            transform.position = finalSafePosition;
+
             dashTimer = dashCooldown;
-            dashDirection = moveInput.normalized;
+
+            Debug.Log("Dash executed to: " + finalSafePosition);
         }
     }
-    void Update()
-    {
-        if (dashCooldown > 0f)
-        {
-            dashCooldown -= Time.deltaTime;
-        }
 
-        // Setting up a mechanism to update the Sprite's Horizontal and Vertical positionings and actions only when the player is actually moving, i.e, the magnitude (sq(x)+sq(y)) is greater than 0
-        anim.SetFloat("Speed", moveInput.sqrMagnitude * moveSpeed);
-        if (moveInput.sqrMagnitude > 0.01f)
-        {
-            anim.SetFloat("Horizontal", moveInput.x);
-            anim.SetFloat("Vertical", moveInput.y);
-        }
-    } 
-
-    void FixedUpdate()
+    public Vector2 CalculateSafeDashPosition(Vector2 dashDirection)
     {
-        if (isDashing)
+        Vector2 startPos = transform.position;
+
+        RaycastHit2D hit = Physics2D.Raycast(startPos, dashDirection, dashDistance, wallLayer);
+
+        if (hit.collider != null)
         {
-            rb.linearVelocity = dashDirection * dashSpeed;
-            dashTimer -= Time.fixedDeltaTime;
-            if (dashTimer < 0f)
-            {
-                isDashing = false;
-                dashTimer = dashCooldown;
-            }
-            else
-            {
-                if (dashTimer > 0f)
-                {
-                    dashTimer -= Time.fixedDeltaTime;
-                }
-            }
+            Debug.Log("Wall detected!");
+            Debug.Log("Hit: " + hit.collider.name);
+            Debug.DrawLine(startPos, hit.point, Color.red, 1f);
+            return hit.point - (dashDirection * safetyBuffer);
         }
         else
         {
-            Vector2 nextPosition = rb.position + moveInput * moveSpeed * Time.fixedDeltaTime;
-
-            float wallX = Mathf.Clamp(nextPosition.x, minX, maxX);
-            float wallY = Mathf.Clamp(nextPosition.y, minY, maxY);
-            // This says If the value is lower than min, return min. If higher than max, return max.
-            rb.MovePosition(new Vector2(wallX, wallY));
+            Debug.Log("Path clear.");
+            Vector2 targetPos = startPos + (dashDirection * dashDistance);
+            Debug.DrawLine(startPos, targetPos, Color.green, 1f);
+            return targetPos;
         }
+    }
+
+    void Update()
+    {
+        if (dashTimer > 0f)
+        {
+            dashTimer -= Time.deltaTime;
+        }
+
+        if (anim != null)
+        {
+            anim.SetFloat("Speed", moveInput.sqrMagnitude * moveSpeed);
+            if (moveInput.sqrMagnitude > 0.01f)
+            {
+                anim.SetFloat("Horizontal", moveInput.x);
+                anim.SetFloat("Vertical", moveInput.y);
+            }
+        }
+    }
+
+    void FixedUpdate()
+    {
+        Vector2 nextPosition = rb.position + moveInput * moveSpeed * Time.fixedDeltaTime;
+        rb.MovePosition(nextPosition);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -116,8 +112,4 @@ public class PlayerController : MonoBehaviour
             Debug.Log("exit collision");
         }
     }
-
-
-
-
 }
