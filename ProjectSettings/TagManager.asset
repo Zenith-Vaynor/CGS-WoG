@@ -4,8 +4,7 @@
 TagManager:
   serializedVersion: 3
   tags:
-  - Square
-  - box
+  - Zombie
   layers:
   - Default
   - TransparentFX
@@ -14,8 +13,8 @@ TagManager:
   - Water
   - UI
   - box
-  - 
-  - 
+  - enemy
+  - player
   - 
   - 
   - 
