@@ -19,6 +19,10 @@ public class PlayerController : MonoBehaviour
     public float attackDamage = 10f;
     public float attackRange = 1f;
     public float health = 100f;
+
+    public float specialAttackCooldown = 3f;
+    public float knockbackForce = 10f;
+    public float specialAttackTimer = 0f;
     
     public LayerMask enemyLayers;
     public LayerMask wallLayer;
@@ -136,6 +140,11 @@ public class PlayerController : MonoBehaviour
                 anim.SetFloat("Vertical", moveInput.y);
             }
         }
+
+        if (specialAttackTimer > 0)
+        {
+            specialAttackTimer -= Time.deltaTime;
+        }
     }
 
     public void OnAttack(InputValue value)
@@ -159,6 +168,48 @@ public class PlayerController : MonoBehaviour
             if (zombie != null)
             {
                 zombie.TakeDamage((int)attackDamage);
+            }
+        }
+    }
+
+    public void OnSpecialAttack(InputValue value)
+    {
+        if (value.isPressed)
+        {
+            SpecialAttack();
+        }
+    }
+
+    void SpecialAttack()
+    {
+        if (specialAttackTimer > 0)
+        {
+            Debug.Log("Special Attack on Cooldown!");
+            return;
+        }
+
+        Debug.Log("Special Attack activated!");
+        anim.SetTrigger("Attack");
+        
+        specialAttackTimer = specialAttackCooldown;
+
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayers);
+
+        foreach (Collider2D enemy in hitEnemies)
+        {
+            ZombieAI zombie = enemy.GetComponent<ZombieAI>();
+
+            if (zombie != null)
+            {
+                zombie.TakeDamage((int)attackDamage * 2);
+
+                Rigidbody2D enemyRb = enemy.GetComponent<Rigidbody2D>();
+                if (enemyRb != null)
+                {
+                    Vector2 knockbackDirection = (enemy.transform.position - transform.position).normalized;
+
+                    enemyRb.AddForce(knockbackDirection * knockbackForce, ForceMode2D.Impulse);
+                }
             }
         }
     }

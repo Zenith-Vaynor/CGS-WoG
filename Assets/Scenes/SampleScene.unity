@@ -334,6 +334,9 @@ MonoBehaviour:
   attackDamage: 10
   attackRange: 1
   health: 100
+  specialAttackCooldown: 3
+  knockbackForce: 10
+  specialAttackTimer: 0
   enemyLayers:
     serializedVersion: 2
     m_Bits: 128
@@ -572,7 +575,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ZombieSpawner
   maxZombieSpawn: 5
-  spawnInterval: 5
+  spawnInterval: 10
   ZombiePrefab: {fileID: 1631326482025359933, guid: 0a17ef6aaa343d0408aa3398472608b7, type: 3}
 --- !u!4 &1936674207
 Transform:
